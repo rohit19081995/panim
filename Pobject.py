@@ -1,4 +1,4 @@
-from common import PanimException
+from common import *
 from Space import Space
 
 class Pobject(object):
