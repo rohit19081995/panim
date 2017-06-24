@@ -20,3 +20,7 @@ class SVGobject(Pobject):
 				self.svg_string = myfile.read()
 		else:
 			raise PanimException('Must initialize SVGobject with SVG string or file')
+
+		svg_dom = minidom.parse(self.svg_string)
+		for element in svg_dom.getElementsByTagName('svg')
+		

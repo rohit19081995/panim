@@ -11,6 +11,7 @@ class Pobject(object):
 		self.center = center
 		self.size = size
 		self.hidden = False
+		self.direct_draw = False
 
 	def hide(self):
 		'''
@@ -23,3 +24,15 @@ class Pobject(object):
 		Unhides the Pobject.
 		'''
 		self.hidden = False
+
+	def crop(self, view):
+		'''
+		Crops the Pobject to the given View.
+		'''
+		pass
+
+	def draw(self, view):
+		'''
+		Draws the Pobject on the given View.
+		'''
+		pass
