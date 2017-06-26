@@ -1,17 +1,14 @@
 from common import *
-from Space import Space
 
 class Pobject(object):
 	"""This class implements all objects that can be displayed"""
-	def __init__(self, space, center = [0,0], size = [10,10]):
-		super(Pobject, self).__init__()
-		if not isinstance(space, Space):
-			raise PanimException('space is not an instance of %s' % Space.__name__)
-		self.space = space
-		self.center = center
-		self.size = size
-		self.hidden = False
+	def __init__(self, hidden = False, **kwargs):
+		super().__init__()
+		self.hidden = hidden
 		self.direct_draw = False
+		self.sub_Pobjects = []
+		self.sub_Pobjects_locations = []
+		self.svg_attributes = kwargs
 
 	def hide(self):
 		'''
@@ -25,14 +22,37 @@ class Pobject(object):
 		'''
 		self.hidden = False
 
-	def crop(self, view):
+	def get_pathstring(self, movestring): # Will be implemented in each directly drawable Pobject subclass.
 		'''
-		Crops the Pobject to the given View.
+		Returns the pathstring to draw.
 		'''
-		pass
+		if not self.direct_draw:
+			pathstring = ''
+			for pobject, location in zip(self.sub_Pobjects, self.sub_Pobjects_locations):
+				loc = movestring.split(' ')[1:]
+				loc[0] = float(loc[0])+location[0]
+				loc[1] = float(loc[1])+location[1]
+				pathstring += pobject.get_pathstring('m %s %s' % (loc[0], loc[1]))
+			return pathstring
+		else:
+			raise PanimException('The general definition of get_pathstring only works for Pobjects that cannot be drawn directly.')
 
-	def draw(self, view):
+	def _scale(self, xscale = 1, yscale = 1):
 		'''
-		Draws the Pobject on the given View.
+		Scales the Pobject by the given scale.
 		'''
-		pass
+		if not self.direct_draw:
+			self.sub_Pobjects_locations = [[x*xscale, y*yscale] for [x,y] in self.sub_Pobjects_locations]
+			for pobject in self.sub_Pobjects:
+				pobject._scale(xscale, yscale)
+		else:
+			raise PanimException('The general definition of scale only works for Pobjects that cannot be drawn directly.')
+
+	def scale(self, scale):
+		self._scale(xscale=scale, yscale = scale)
+
+	def xscale(self, scale):
+		self._scale(xscale=scale)
+
+	def yscale(self, scale):
+		self._scale(yscale=scale)
