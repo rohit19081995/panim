@@ -26,6 +26,7 @@ class Pobject(object):
 		'''
 		Returns the pathstring to draw.
 		'''
+		self._update()
 		if not self.direct_draw:
 			pathstring = ''
 			for pobject, location in zip(self.sub_Pobjects, self.sub_Pobjects_locations):
@@ -36,6 +37,14 @@ class Pobject(object):
 			return pathstring
 		else:
 			raise PanimException('The general definition of get_pathstring only works for Pobjects that cannot be drawn directly.')
+
+	def _update(self):
+		'''
+		Updates the Pobject and its subPobjects.
+		'''
+		if not self.direct_draw:
+			for pobject in self.sub_Pobjects:
+				pobject._update()
 
 	def _scale(self, xscale = 1, yscale = 1):
 		'''
