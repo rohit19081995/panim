@@ -2,14 +2,37 @@ import numpy as np
 
 from Pobject import Pobject
 
+class Line(Pobject):
+	'''
+	This class implements a line.
+	'''
+	def __init__(self, x1, y1, x2, y2, **kwargs):
+		super.__init__()
+		self.x1 = x1
+		self.x2 = x2
+		self.y1 = y1
+		self.y2 = y2
+		self.direct_draw = True
+		self.kwargs = kwargs
+
+		# SVG Path format:
+		# l x y
+
+	def get_pathstring(self, movestring):
+		pathstring = '<path d="'
+		pathstring += '%s m %f %f ' % (movestring, self.x1, self.y1)
+		pathstring += 'l %f %f"' % (self.x2, self.y2)
+		for attribute, value in self.kwargs.items():
+			pathstring += ' %s="%s"' % (attribute.replace('_','-'), value)
+		pathstring += '/>'
+
+		return pathstring
+
 class Arc(Pobject):
 	'''
 	This class implements an arc.
 	'''
 	def __init__(self, rx=1, ry=1, start_angle=0, end_angle=360, phi=0, **kwargs):
-		'''
-		This class implements an arc (the SVG path).
-		'''
 		super().__init__()
 		self.rx = rx
 		self.ry = ry
@@ -20,7 +43,7 @@ class Arc(Pobject):
 		self.kwargs = kwargs
 
 		# SVG Path format:
-		# A rx ry x-axis-rotation large-arc-flag sweep-flag x y
+		# l rx ry x-axis-rotation large-arc-flag sweep-flag x y
 
 	def get_pathstring(self, movestring):
 		r = self.rx*self.ry/(np.sqrt(self.ry**2*np.cos(self.start_angle)**2 + self.rx**2*np.sin(self.start_angle)**2))
@@ -36,9 +59,9 @@ class Arc(Pobject):
 		# Moving to rx on x-axis
 		pathstring = '<path d="'
 		pathstring += '%s m %f %f ' % (movestring, self.start_point[0], self.start_point[1])
-		pathstring += 'A %f %f %f %d %d %f %f "' % (self.rx, self.ry, -self.phi*180/np.pi, laf, False, self.end_point[0], self.end_point[1])
+		pathstring += 'a %f %f %f %d %d %f %f "' % (self.rx, self.ry, -self.phi*180/np.pi, laf, False, self.end_point[0]-self.start_point[0], self.end_point[1]-self.start_point[1])
 		for attribute, value in self.kwargs.items():
-			pathstring += ' %s="%s"' % (attribute, value)
+			pathstring += ' %s="%s"' % (attribute.replace('_','-'), value)
 		pathstring += '/>'
 
 		return pathstring
