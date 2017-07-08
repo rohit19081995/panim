@@ -13,19 +13,12 @@ class Line(Pobject):
 		self.y1 = y1
 		self.y2 = y2
 		self.direct_draw = True
-		self.kwargs = kwargs
 
 		# SVG Path format:
 		# l x y
 
-	def get_pathstring(self, movestring):
-		pathstring = '<path d="'
-		pathstring += '%s m %f %f ' % (movestring, self.x1, self.y1)
-		pathstring += 'l %f %f"' % (self.x2, self.y2)
-		for attribute, value in self.kwargs.items():
-			pathstring += ' %s="%s"' % (attribute.replace('_','-'), value)
-		pathstring += '/>'
-
+	def get_direct_pathstring(self):
+		pathstring += 'm %f %f l %f %f"' % (self.x1, self.y1, self.x2, self.y2)
 		return pathstring
 
 class Arc(Pobject):
@@ -33,19 +26,18 @@ class Arc(Pobject):
 	This class implements an arc.
 	'''
 	def __init__(self, rx=1, ry=1, start_angle=0, end_angle=360, phi=0, **kwargs):
-		super().__init__()
+		super().__init__(**kwargs)
 		self.rx = rx
 		self.ry = ry
 		self.start_angle = start_angle
 		self.end_angle = end_angle
 		self.phi = phi
 		self.direct_draw = True
-		self.kwargs = kwargs
 
 		# SVG Path format:
 		# l rx ry x-axis-rotation large-arc-flag sweep-flag x y
 
-	def get_pathstring(self, movestring):
+	def get_direct_pathstring(self):
 		r = self.rx*self.ry/(np.sqrt(self.ry**2*np.cos(self.start_angle)**2 + self.rx**2*np.sin(self.start_angle)**2))
 		self.start_point = [r*np.cos(self.start_angle+self.phi), -r*np.sin(self.start_angle+self.phi)]
 
@@ -57,12 +49,12 @@ class Arc(Pobject):
 		else:
 			laf = False
 		# Moving to rx on x-axis
-		pathstring = '<path d="'
-		pathstring += '%s m %f %f ' % (movestring, self.start_point[0], self.start_point[1])
+		# pathstring = '<path d="'
+		pathstring = 'm %f %f ' % (self.start_point[0], self.start_point[1])
 		pathstring += 'a %f %f %f %d %d %f %f "' % (self.rx, self.ry, -self.phi*180/np.pi, laf, False, self.end_point[0]-self.start_point[0], self.end_point[1]-self.start_point[1])
-		for attribute, value in self.kwargs.items():
-			pathstring += ' %s="%s"' % (attribute.replace('_','-'), value)
-		pathstring += '/>'
+		# for attribute, value in self.svg_attributes.items():
+		# 	pathstring += ' %s="%s"' % (attribute.replace('_','-'), value)
+		# pathstring += '/>'
 
 		return pathstring
 
@@ -95,7 +87,8 @@ class Ellipse(Pobject):
 		self.sub_Pobjects[1].start_angle=(self.end_angle-start_angle)/3
 
 	def set_end_angle(self, end_angle):
-		end_angle = end_angle % (2*np.pi)
+		if end_angle > 2*np.pi:
+			end_angle = end_angle % (2*np.pi)
 		self.end_angle=end_angle
 		self.sub_Pobjects[0].end_angle=(end_angle-self.start_angle)*2/3
 		self.sub_Pobjects[1].start_angle=(end_angle-self.start_angle)/3

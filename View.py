@@ -8,13 +8,19 @@ class View(object):
 	"""
 	This class draws the Pobjects in the view.
 	"""
-	def __init__(self, space, resolution = DEFAULT_VIDEO_RESOLUTION, center = [0,0], size = [8,6]):
+	def __init__(self, space, resolution = DEFAULT_VIDEO_RESOLUTION, center = [0,0], size = [8,6], **kwargs):
 		super(View, self).__init__()
 		self.resolution = resolution
 		self.aspect_ratio = self.resolution[0]/self.resolution[1]
 		self.space = space
 		self.size = size
 		self.center = center
+		self.kwargs = kwargs
+
+		if self.kwargs is not None and 'background' not in self.kwargs:
+			self.kwargs['background'] = 'white'
+		elif self.kwargs is None:
+			self.kwargs = {'background':'white'}
 
 	def maintain_aspect(self, xlen = None, ylen = None):
 		'''
@@ -49,8 +55,14 @@ class View(object):
 																			  self.center[1]-self.size[1]/2,
 																			  self.size[0],
 																			  self.size[1])
+		svg_string += '<path d="M%f %f h %f v %f h %f Z" fill="%s"/>' % (self.center[0]-self.size[0]/2,
+																	self.center[1]-self.size[1]/2,
+																	self.size[0],
+																	self.size[1],
+																	-self.size[0],
+																	self.kwargs['background'])
 		for pobject, location in zip(self.space.pobjects, self.space.pobjects_locations):
 			svg_string += pobject.get_pathstring('m %f %f' % (location[0], location[1]))
 		svg_string += '</svg>'
 
-		return cairosvg.svg2png(svg_string)
+		return cairosvg.svg2png(svg_string), svg_string
