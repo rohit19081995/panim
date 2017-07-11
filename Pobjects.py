@@ -7,7 +7,7 @@ class Line(Pobject):
 	This class implements a line.
 	'''
 	def __init__(self, x1, y1, x2, y2, **kwargs):
-		super.__init__()
+		super().__init__()
 		self.x1 = x1
 		self.x2 = x2
 		self.y1 = y1
@@ -18,8 +18,14 @@ class Line(Pobject):
 		# l x y
 
 	def get_direct_pathstring(self):
-		pathstring += 'm %f %f l %f %f"' % (self.x1, self.y1, self.x2, self.y2)
+		pathstring = 'm %f %f l %f %f ' % (self.x1, self.y1, self.x2, self.y2)
 		return pathstring
+
+	def _scale(self, xscale=1, yscale=1):
+		self.x1 = self.x1*xscale
+		self.x2 = self.x2*xscale
+		self.y2 = self.y2*yscale
+		self.y1 = self.y1*yscale
 
 class Arc(Pobject):
 	'''
@@ -33,6 +39,12 @@ class Arc(Pobject):
 		self.end_angle = end_angle
 		self.phi = phi
 		self.direct_draw = True
+
+		r = self.rx*self.ry/(np.sqrt(self.ry**2*np.cos(self.start_angle)**2 + self.rx**2*np.sin(self.start_angle)**2))
+		self.start_point = [r*np.cos(self.start_angle+self.phi), -r*np.sin(self.start_angle+self.phi)]
+
+		r = self.rx*self.ry/(np.sqrt(self.ry**2*np.cos(self.end_angle)**2 + self.rx**2*np.sin(self.end_angle)**2))
+		self.end_point = [r*np.cos(self.end_angle+self.phi), -r*np.sin(self.end_angle+self.phi)]
 
 		# SVG Path format:
 		# l rx ry x-axis-rotation large-arc-flag sweep-flag x y
@@ -51,7 +63,7 @@ class Arc(Pobject):
 		# Moving to rx on x-axis
 		# pathstring = '<path d="'
 		pathstring = 'm %f %f ' % (self.start_point[0], self.start_point[1])
-		pathstring += 'a %f %f %f %d %d %f %f "' % (self.rx, self.ry, -self.phi*180/np.pi, laf, False, self.end_point[0]-self.start_point[0], self.end_point[1]-self.start_point[1])
+		pathstring += 'a %f %f %f %d %d %f %f ' % (self.rx, self.ry, -self.phi*180/np.pi, laf, False, self.end_point[0]-self.start_point[0], self.end_point[1]-self.start_point[1])
 		# for attribute, value in self.svg_attributes.items():
 		# 	pathstring += ' %s="%s"' % (attribute.replace('_','-'), value)
 		# pathstring += '/>'

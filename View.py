@@ -33,11 +33,17 @@ class View(object):
 		else:
 			raise PanimException('Must pass either xlen or ylen.')
 
-	def move(self, center = [0,0]):
+	def move(self, center = None, dx = None, dy = None):
 		'''
-		Moves the viewport to the given coordinates. (Default is 0,0)
+		Moves the viewport to the given coordinates or by given dx/dy. (Default is 0,0)
 		'''
-		self.center = center
+		if center is not None:
+			self.center = center
+		else:
+			if dx is not None:
+				self.center[0]+=dx
+			if dy is not None:
+				self.center[1]+=dy
 
 	def zoom(self, scale):
 		'''
@@ -61,8 +67,11 @@ class View(object):
 																	self.size[1],
 																	-self.size[0],
 																	self.kwargs['background'])
-		for pobject, location in zip(self.space.pobjects, self.space.pobjects_locations):
-			svg_string += pobject.get_pathstring('m %f %f' % (location[0], location[1]))
+		for pobject, location, attributes_string in zip(self.space.pobjects, self.space.pobjects_locations, self.space.pobjects_attributes_list):
+			svg_string += '<path d="'
+			svg_string += pobject.get_pathstring('M %f %f' % (location[0], location[1])) + '"'
+			svg_string += attributes_string
+			svg_string += '/>'
 		svg_string += '</svg>'
 
 		return cairosvg.svg2png(svg_string), svg_string

@@ -1,3 +1,4 @@
 *.pyc
 *.png
+pconstants.py
 test/*
