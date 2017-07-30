@@ -6,25 +6,25 @@ class Line(Pobject):
 	'''
 	This class implements a line.
 	'''
-	def __init__(self, x1, y1, x2, y2, **kwargs):
+	def __init__(self, x1, y1, dx, dy, **kwargs):
 		super().__init__()
 		self.x1 = x1
-		self.x2 = x2
+		self.dx = dx
 		self.y1 = y1
-		self.y2 = y2
+		self.dy = dy
 		self.direct_draw = True
 
 		# SVG Path format:
 		# l x y
 
 	def get_direct_pathstring(self):
-		pathstring = 'm %f %f l %f %f ' % (self.x1, self.y1, self.x2, self.y2)
+		pathstring = 'm %f %f l %f %f ' % (self.x1, self.y1, self.dx, self.dy)
 		return pathstring
 
 	def _scale(self, xscale=1, yscale=1):
 		self.x1 = self.x1*xscale
-		self.x2 = self.x2*xscale
-		self.y2 = self.y2*yscale
+		self.dx = self.dx*xscale
+		self.dy = self.dy*yscale
 		self.y1 = self.y1*yscale
 
 class Arc(Pobject):
