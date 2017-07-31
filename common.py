@@ -1,4 +1,5 @@
-from numpy import linalg
+import numpy as np
+from scipy import linalg
 
 from constants import *
 
@@ -9,7 +10,7 @@ class PanimException(Exception):
 	pass
 
 def is_closed(points, threshold=CLOSED_THRESHOLD):
-    return np.linalg.norm(points[0] - points[-1]) < threshold
+    return linalg.norm(points[0] - points[-1]) < threshold
 
 def get_smooth_handle_points(points):
     points = np.array(points)

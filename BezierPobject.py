@@ -21,7 +21,7 @@ class BPobject(Pobject):
 		return points, points_modes
 
 	def get_pathstring(self):
-		points_list, points_modes_list = get_points()
+		points_list, points_modes_list = self.get_points()
 		points_list = np.array(points_list)
 		points_modes_list = np.array(points_modes_list)
 		pathstring = ''
@@ -29,8 +29,8 @@ class BPobject(Pobject):
 			if mode == 'smooth':
 				pathstring += 'm %f %f' % (points[0][0], points[0][1])
 				p1arr, p2arr = get_smooth_handle_points(points)
-				for p1, p2, p3 in zip(p1arr, p2arr, points[1:]):
-					pathstring += 'c %f %f, %f %f, %f %f' % (p1[0], p1[1], p2[0], p2[1], p3[0], p3[1])
+				for p1, p2, p3 in zip(p1arr-points[:-1], p2arr-points[:-1], points[1:]-points[:-1]):
+					pathstring += 'c %f,%f %f,%f %f,%f' % (p1[0], p1[1], p2[0], p2[1], p3[0], p3[1])
 			elif mode == 'jagged':
 				pathstring += 'm %f %f' % (points[0][0], points[0][1])
 				for point in points[1:]:
@@ -39,6 +39,7 @@ class BPobject(Pobject):
 				pathstring  += 'M %f %f' % (points[-1][0], points[-1][0])
 			else:
 				raise PanimException('Invalid mode %s'%mode)
+		return pathstring
 
 class Curve(BPobject):
 	'''Implements a continuous cubic bezier curves'''
@@ -47,7 +48,7 @@ class Curve(BPobject):
 		self.mode = mode
 
 	def get_points(self):
-		return [self.points], [mode]
+		return [self.points], [self.mode]
 
 class Move(BPobject):
 	'''Implements a Move command'''
