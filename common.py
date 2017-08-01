@@ -10,7 +10,7 @@ class PanimException(Exception):
 	pass
 
 def is_closed(points, threshold=CLOSED_THRESHOLD):
-    return linalg.norm(points[0] - points[-1]) < threshold
+	return linalg.norm(np.array(points[0]) - np.array(points[-1])) < threshold
 
 def get_smooth_handle_points(points):
     points = np.array(points)

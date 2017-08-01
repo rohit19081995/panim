@@ -1,6 +1,7 @@
 import cairosvg
 
 from Space import Space
+from BezierPobject import BPobject
 from common import *
 from constants import *
 
@@ -68,10 +69,14 @@ class View(object):
 																	-self.size[0],
 																	self.kwargs['background'])
 		for pobject, location, attributes_string in zip(self.space.pobjects, self.space.pobjects_locations, self.space.pobjects_attributes_list):
-			svg_string += '<path d="'
-			svg_string += pobject.get_pathstring('M %f %f' % (location[0], location[1])) + '"'
-			svg_string += attributes_string
-			svg_string += '/>'
+			if isinstance(pobject, BPobject):
+				svg_string += '<path d="'
+				svg_string += 'M %f %f' % (location[0], location[1])
+				svg_string += pobject.get_pathstring() + '"'
+				svg_string += attributes_string
+				svg_string += '/>'
+			else:
+				raise NotImplementedError()
 		svg_string += '</svg>'
 
 		return cairosvg.svg2png(svg_string), svg_string

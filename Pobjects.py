@@ -1,122 +1,71 @@
 import numpy as np
 
 from Pobject import Pobject
+from BezierPobject import Curve
 
-class Line(Pobject):
+class Line(Curve):
 	'''
 	This class implements a line.
 	'''
 	def __init__(self, x1, y1, dx, dy, **kwargs):
-		super().__init__()
-		self.x1 = x1
-		self.dx = dx
-		self.y1 = y1
-		self.dy = dy
-		self.direct_draw = True
+		super().__init__(mode='jagged')
+		self.start = [x1, y1]
+		self.end = [dx,dy]
 
 		# SVG Path format:
 		# l x y
 
-	def get_direct_pathstring(self):
-		pathstring = 'm %f %f l %f %f ' % (self.x1, self.y1, self.dx, self.dy)
-		return pathstring
+	def generate_points(self):
+		self.points = [self.start, self.end]
 
-	def _scale(self, xscale=1, yscale=1):
-		self.x1 = self.x1*xscale
-		self.dx = self.dx*xscale
-		self.dy = self.dy*yscale
-		self.y1 = self.y1*yscale
+	# def _scale(self, xscale=1, yscale=1):
+	# 	self.x1 = self.x1*xscale
+	# 	self.dx = self.dx*xscale
+	# 	self.dy = self.dy*yscale
+	# 	self.y1 = self.y1*yscale
 
-class Arc(Pobject):
+class Arc(Curve):
 	'''
 	This class implements an arc.
 	'''
-	def __init__(self, rx=1, ry=1, start_angle=0, end_angle=360, phi=0, **kwargs):
-		super().__init__(**kwargs)
+	def __init__(self, rx=1, ry=1, start_angle=0, end_angle=2*np.pi, phi=0, no_of_points=10):
 		self.rx = rx
 		self.ry = ry
 		self.start_angle = start_angle
 		self.end_angle = end_angle
 		self.phi = phi
-		self.direct_draw = True
+		self.no_of_points = no_of_points
+		super().__init__()
 
-		r = self.rx*self.ry/(np.sqrt(self.ry**2*np.cos(self.start_angle)**2 + self.rx**2*np.sin(self.start_angle)**2))
-		self.start_point = [r*np.cos(self.start_angle+self.phi), -r*np.sin(self.start_angle+self.phi)]
+	def generate_points(self):
+		points = []
+		for i in range(self.no_of_points):
+			theta = self.start_angle+(self.end_angle-self.start_angle)/(self.no_of_points-1)*i
+			r = self.rx*self.ry/(np.sqrt(self.ry**2*np.cos(theta)**2 + self.rx**2*np.sin(theta)**2))
+			points.append([r*np.cos(theta+self.phi), -r*np.sin(theta+self.phi)])
+		self.points = points
 
-		r = self.rx*self.ry/(np.sqrt(self.ry**2*np.cos(self.end_angle)**2 + self.rx**2*np.sin(self.end_angle)**2))
-		self.end_point = [r*np.cos(self.end_angle+self.phi), -r*np.sin(self.end_angle+self.phi)]
+	# def _scale(self, xscale = 1, yscale = 1):
+	# 	self.rx = self.rx*xscale
+	# 	self.ry = self.ry*yscale
 
-		# SVG Path format:
-		# l rx ry x-axis-rotation large-arc-flag sweep-flag x y
-
-	def get_direct_pathstring(self):
-		r = self.rx*self.ry/(np.sqrt(self.ry**2*np.cos(self.start_angle)**2 + self.rx**2*np.sin(self.start_angle)**2))
-		self.start_point = [r*np.cos(self.start_angle+self.phi), -r*np.sin(self.start_angle+self.phi)]
-
-		r = self.rx*self.ry/(np.sqrt(self.ry**2*np.cos(self.end_angle)**2 + self.rx**2*np.sin(self.end_angle)**2))
-		self.end_point = [r*np.cos(self.end_angle+self.phi), -r*np.sin(self.end_angle+self.phi)]
-
-		if np.abs((self.end_angle-self.start_angle)) > np.pi:
-			laf = True
-		else:
-			laf = False
-		# Moving to rx on x-axis
-		# pathstring = '<path d="'
-		pathstring = 'm %f %f ' % (self.start_point[0], self.start_point[1])
-		pathstring += 'a %f %f %f %d %d %f %f ' % (self.rx, self.ry, -self.phi*180/np.pi, laf, False, self.end_point[0]-self.start_point[0], self.end_point[1]-self.start_point[1])
-		# for attribute, value in self.svg_attributes.items():
-		# 	pathstring += ' %s="%s"' % (attribute.replace('_','-'), value)
-		# pathstring += '/>'
-
-		return pathstring
-
-	def _scale(self, xscale = 1, yscale = 1):
-		self.rx = self.rx*xscale
-		self.ry = self.ry*yscale
-
-class Ellipse(Pobject):
+class Ellipse(Arc):
 	'''
 	This class creates an ellipse.
 	'''
-	def __init__(self, rx=1, ry=1, start_angle=0, end_angle=2*np.pi, phi=0, **kwargs):
-		super().__init__(**kwargs)
-		self.sub_Pobjects = [
-							Arc(rx=rx, ry=ry, start_angle=start_angle, end_angle=(end_angle-start_angle)*2/3, phi=phi, **kwargs),
-							Arc(rx=rx, ry=ry, start_angle=(end_angle-start_angle)/3, end_angle=end_angle, phi=phi, **kwargs)
-							]
-		self.sub_Pobjects_locations = [[0,0], [0,0]]
-		self.start_angle = start_angle
-		self.end_angle = end_angle
-		self.phi = phi
-		self.direct_draw = False
-		
+	def __init__(self, rx=1, ry=1, phi=0, no_of_points=10):
+		super().__init__(rx, ry, 0, 2*np.pi, phi, no_of_points)
 
-	def set_start_angle(self, start_angle):
-		start_angle = start_angle % (2*np.pi)
-		self.start_angle=start_angle
-		self.sub_Pobjects[0].start_angle=start_angle
-		self.sub_Pobjects[0].end_angle=(self.end_angle-start_angle)*2/3
-		self.sub_Pobjects[1].start_angle=(self.end_angle-start_angle)/3
+class CircularArc(Arc):
+	'''
+	This implements a circular arc.
+	'''
+	def __init__(self, r=1, start_angle=0, end_angle=360, phi=0, no_of_points=10):
+		super().__init__(r, r, start_angle, end_angle, phi, no_of_points)
 
-	def set_end_angle(self, end_angle):
-		if end_angle > 2*np.pi:
-			end_angle = end_angle % (2*np.pi)
-		self.end_angle=end_angle
-		self.sub_Pobjects[0].end_angle=(end_angle-self.start_angle)*2/3
-		self.sub_Pobjects[1].start_angle=(end_angle-self.start_angle)/3
-		self.sub_Pobjects[1].end_angle=end_angle
-
-	def set_phi(self, phi):
-		self.phi=phi
-		self.sub_Pobjects[0].phi=phi
-		self.sub_Pobjects[1].phi=phi
-
-	def set_rx(self, rx):
-		self.rx=rx
-		self.sub_Pobjects[0].rx=rx
-		self.sub_Pobjects[0].rx=rx
-
-	def set_ry(self, ry):
-		self.rx=ry
-		self.sub_Pobjects[0].ry=ry
-		self.sub_Pobjects[0].ry=ry
+class Circle(CircularArc):
+	'''
+	This class implements a circle.
+	'''
+	def __init__(self, r=1, start_angle=0, end_angle=360, phi=0, no_of_points=10):
+		super().__init__(r, 0, 2*np.pi, phi, no_of_points)
