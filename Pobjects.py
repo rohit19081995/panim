@@ -12,17 +12,8 @@ class Line(Curve):
 		self.start = [x1, y1]
 		self.end = [dx,dy]
 
-		# SVG Path format:
-		# l x y
-
 	def generate_points(self):
 		self.points = [self.start, self.end]
-
-	# def _scale(self, xscale=1, yscale=1):
-	# 	self.x1 = self.x1*xscale
-	# 	self.dx = self.dx*xscale
-	# 	self.dy = self.dy*yscale
-	# 	self.y1 = self.y1*yscale
 
 class Arc(Curve):
 	'''
@@ -44,10 +35,6 @@ class Arc(Curve):
 			r = self.rx*self.ry/(np.sqrt(self.ry**2*np.cos(theta)**2 + self.rx**2*np.sin(theta)**2))
 			points.append([r*np.cos(theta+self.phi), -r*np.sin(theta+self.phi)])
 		self.points = points
-
-	# def _scale(self, xscale = 1, yscale = 1):
-	# 	self.rx = self.rx*xscale
-	# 	self.ry = self.ry*yscale
 
 class Ellipse(Arc):
 	'''
