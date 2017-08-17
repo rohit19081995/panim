@@ -76,9 +76,6 @@ class Curve(BPobject):
 		self.points = None
 		self.mode = mode
 
-	def regenerate_points(self):
-		pass # Implemented by subclass if necessary.
-
 	def get_points_and_mode(self):
 		points = self.get_points()
 		if points is None:
