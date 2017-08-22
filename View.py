@@ -75,6 +75,9 @@ class View(object):
 				svg_string += pobject.get_pathstring() + '"'
 				svg_string += attributes_string
 				svg_string += '/>'
+			elif isinstance(pobject, TexPobject):
+				defs_string += pobject.get_defs()
+				svg_string += pobject.get_pathstring(location)
 			else:
 				raise NotImplementedError()
 		svg_string += '</svg>'
