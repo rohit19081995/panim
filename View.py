@@ -2,6 +2,7 @@ import cairosvg
 
 from Space import Space
 from BezierPobject import BPobject
+from TexPobject import TexPobject
 from common import *
 from constants import *
 
@@ -56,13 +57,14 @@ class View(object):
 		'''
 		Returns a png file as a bytes object.
 		'''
-		svg_string = '<svg width="%d" height="%d" viewBox="%f %f %f %f" shape-rendering="geometricPrecision">' % (self.resolution[0],
+		defs_string = ''
+		start_string = '<svg xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' width="%d" height="%d" viewBox="%f %f %f %f" shape-rendering="geometricPrecision">' % (self.resolution[0],
 																			  self.resolution[1],
 																			  self.center[0]-self.size[0]/2,
 																			  self.center[1]-self.size[1]/2,
 																			  self.size[0],
 																			  self.size[1])
-		svg_string += '<path d="M%f %f h %f v %f h %f Z" fill="%s"/>' % (self.center[0]-self.size[0]/2,
+		objects_string = '<path d="M%f %f h %f v %f h %f Z" fill="%s"/>' % (self.center[0]-self.size[0]/2,
 																	self.center[1]-self.size[1]/2,
 																	self.size[0],
 																	self.size[1],
@@ -70,16 +72,18 @@ class View(object):
 																	self.kwargs['background'])
 		for pobject, location, attributes_string in zip(self.space.pobjects, self.space.pobjects_locations, self.space.pobjects_attributes_list):
 			if isinstance(pobject, BPobject):
-				svg_string += '<path d="'
-				svg_string += 'M %f %f' % (location[0], location[1])
-				svg_string += pobject.get_pathstring() + '"'
-				svg_string += attributes_string
-				svg_string += '/>'
+				objects_string += '<path d="'
+				objects_string += 'M %f %f' % (location[0], location[1])
+				objects_string += pobject.get_pathstring() + '"'
+				objects_string += attributes_string
+				objects_string += '/>'
 			elif isinstance(pobject, TexPobject):
 				defs_string += pobject.get_defs()
-				svg_string += pobject.get_pathstring(location)
+				objects_string += pobject.get_pathstring(location)
 			else:
 				raise NotImplementedError()
-		svg_string += '</svg>'
+		svg_string = '%s<defs>\n%s</defs>%s</svg>' % (start_string, defs_string, objects_string)
+
+		print(svg_string)
 
 		return cairosvg.svg2png(svg_string), svg_string

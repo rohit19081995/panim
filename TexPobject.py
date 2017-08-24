@@ -37,8 +37,8 @@ class TexPobject(Pobject):
         return self.defs_string
 
     def get_pathstring(self, location):
-        <use x='-72' xlink:href='#g0-89' y='-65.1922'/>
-        return '<use x=\'%f\' y=\'%f\' xlink:href=\'TexPobject_%d\'' % (location[0], location[1], self.texPobject_number)
+        # <use x='-72' xlink:href='#g0-89' y='-65.1922'/>
+        return '<use x=\'%f\' y=\'%f\' xlink:href=\'#TexPobject-%d\'/>' % (location[0], location[1], self.texPobject_number)
 
     def close(self):
         shutil.rmtree(self.tex_dir)
@@ -93,9 +93,9 @@ class TexPobject(Pobject):
             for line in contents[4:-2]:
                 print(line)
                 if '<g id=\'page1\'>\n' == line:
-                    line = '<g id=\'TexPobject_%d\'>\n' % (TexPobject.no_of_TexPobjects)
+                    line = '<g id=\'TexPobject-%d\ transform=\'translate(%f %f)\'>\n' % (TexPobject.no_of_TexPobjects, -self._x, -self._y)
                 pattern = regex.findall(line)
                 for word in pattern:
-                    line = line.replace(word, '%s_%d' % (word, TexPobject.no_of_TexPobjects))
+                    line = line.replace(word, '%s-%d' % (word, TexPobject.no_of_TexPobjects))
                 self.defs_string += line
-            self.defs_string += '</g transform=translate(%f %f)>' % (-self._x, -self._y)
+            self.defs_string += '</g>'
