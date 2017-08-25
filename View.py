@@ -10,12 +10,12 @@ class View(object):
 	"""
 	This class draws the Pobjects in the view.
 	"""
-	def __init__(self, space, resolution = DEFAULT_VIDEO_RESOLUTION, center = [0,0], size = [8,6], **kwargs):
+	def __init__(self, space, resolution = DEFAULT_VIDEO_RESOLUTION, center = [0,0], y_extent = 6, **kwargs):
 		super(View, self).__init__()
 		self.resolution = resolution
 		self.aspect_ratio = self.resolution[0]/self.resolution[1]
 		self.space = space
-		self.size = size
+		self.size = [y_extent*self.aspect_ratio, y_extent]
 		self.center = center
 		self.kwargs = kwargs
 
@@ -83,7 +83,4 @@ class View(object):
 			else:
 				raise NotImplementedError()
 		svg_string = '%s<defs>\n%s</defs>%s</svg>' % (start_string, defs_string, objects_string)
-
-		print(svg_string)
-
 		return cairosvg.svg2png(svg_string), svg_string

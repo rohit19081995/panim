@@ -14,6 +14,8 @@ class TexPobject(Pobject):
 
     def __init__(self, texstring, filename = 'temp', tex_dir = TEX_DIR):
         super().__init__()
+        self.xscale = 0.05
+        self.yscale = 0.05
         self.texstring = texstring
         TexPobject.no_of_TexPobjects += 1
         self.texPobject_number = TexPobject.no_of_TexPobjects
@@ -38,13 +40,21 @@ class TexPobject(Pobject):
 
     def get_pathstring(self, location):
         # <use x='-72' xlink:href='#g0-89' y='-65.1922'/>
-        return '<use x=\'%f\' y=\'%f\' xlink:href=\'#TexPobject-%d\'/>' % (location[0], location[1], self.texPobject_number)
+        return '<use x=\'%f\' y=\'%f\' xlink:href=\'#TexPobject-%d\' transform=\'scale(%f %f)\'/>' % (location[0], location[1], self.texPobject_number, self.xscale, self.yscale)
 
     def close(self):
         shutil.rmtree(self.tex_dir)
 
     def create_dir(self):
         os.makedirs(self.tex_dir)
+
+    def _scale(self, xscale=1, yscale=1):
+        self.xscale *= xscale
+        self.yscale *= yscale
+
+    def set_fontsize(self, fontsize):
+        self.xscale = 0.05/10*fontsize
+        self.yscale = 0.05/10*fontsize
 
     def texwriter(self, texstring = None):
         if texstring is not None:
@@ -91,9 +101,8 @@ class TexPobject(Pobject):
             contents.remove('</defs>\n')
             regex = re.compile(r"#{,1}g[0-9]*-[0-9]*")
             for line in contents[4:-2]:
-                print(line)
                 if '<g id=\'page1\'>\n' == line:
-                    line = '<g id=\'TexPobject-%d\ transform=\'translate(%f %f)\'>\n' % (TexPobject.no_of_TexPobjects, -self._x, -self._y)
+                    line = '<g id=\'TexPobject-%d\' transform=\'translate(%f %f)\'>\n' % (TexPobject.no_of_TexPobjects, -self._x-self._dx/2, -self._y-self._dy/2)
                 pattern = regex.findall(line)
                 for word in pattern:
                     line = line.replace(word, '%s-%d' % (word, TexPobject.no_of_TexPobjects))

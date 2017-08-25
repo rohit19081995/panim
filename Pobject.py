@@ -37,22 +37,21 @@ class Pobject(object):
 	# 	return pathstring
 
 
-	# def _scale(self, xscale = 1, yscale = 1):
-	# 	'''
-	# 	Scales the Pobject by the given scale.
-	# 	'''
-	# 	if not self.direct_draw:
-	# 		self.sub_Pobjects_locations = [[x*xscale, y*yscale] for [x,y] in self.sub_Pobjects_locations]
-	# 		for pobject in self.sub_Pobjects:
-	# 			pobject._scale(xscale, yscale)
-	# 	else:
-	# 		raise PanimException('The general definition of scale only works for Pobjects that cannot be drawn directly.')
+	def _scale(self, xscale = 1, yscale = 1):
+		'''
+		Scales the Pobject by the given scale.
+		'''
+		self.sub_Pobjects_locations = [[x*xscale, y*yscale] for [x,y] in self.sub_Pobjects_locations]
+		for pobject in self.sub_Pobjects:
+			pobject._scale(xscale, yscale)
+		else:
+			raise PanimException('The general definition of scale only works for Pobjects that cannot be drawn directly.')
 
-	# def scale(self, scale):
-	# 	self._scale(xscale=scale, yscale = scale)
+	def scale(self, scale):
+		self._scale(xscale=scale, yscale = scale)
 
-	# def xscale(self, scale):
-	# 	self._scale(xscale=scale)
+	def xscale(self, scale):
+		self._scale(xscale=scale)
 
-	# def yscale(self, scale):
-	# 	self._scale(yscale=scale)
+	def yscale(self, scale):
+		self._scale(yscale=scale)

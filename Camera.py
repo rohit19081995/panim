@@ -25,7 +25,7 @@ class Camera(object):
 	            '-y',                # overwrite output file if it exists
 	            '-f', 'image2pipe',
 	            '-codec', 'png',
-	            '-s', '800x600',
+	            '-s', '%dx%d' % (self.view.resolution[0], self.view.resolution[1]),
 	            '-i', '-',      # The input comes from a pipe
 	            '-an',          # Tells FFMPEG not to expect any audio
 	            '%s%s_%s.mp4' % (self.camera_dir, filename, dt.datetime.now().strftime('%Y%m%d%H%M%S')),

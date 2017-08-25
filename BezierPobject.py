@@ -55,15 +55,6 @@ class BPobject(Pobject):
 				raise PanimException('Invalid mode %s'%mode)
 		return pathstring
 
-	def scale(self, scale):
-		self._scale(xscale=scale, yscale=scale)
-
-	def xscale(self, scale):
-		self._scale(xscale=scale)
-
-	def yscale(self, scale):
-		self._scale(yscale=scale)
-
 	def _scale(self, xscale=1, yscale=1):
 		for segment_index in range(len(self.points)):
 			for point_index in range(len(self.points[segment_index])):
