@@ -10,7 +10,7 @@ class View(object):
 	"""
 	This class draws the Pobjects in the view.
 	"""
-	def __init__(self, space, resolution = DEFAULT_VIDEO_RESOLUTION, center = [0,0], y_extent = 6, **kwargs):
+	def __init__(self, space, resolution = DEFAULT_VIDEO_RESOLUTION, center = [0,0], y_extent = Y_EXTENT, **kwargs):
 		super(View, self).__init__()
 		self.resolution = resolution
 		self.aspect_ratio = self.resolution[0]/self.resolution[1]

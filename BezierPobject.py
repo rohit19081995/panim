@@ -30,6 +30,9 @@ class BPobject(Pobject):
 		self.points_modes = points_modes
 		return points, points_modes
 
+	def generate_points(self):
+		pass
+
 	def get_pathstring(self):
 		points_list, points_modes_list = self.get_points_and_mode()
 		points_list = points_list
@@ -64,7 +67,7 @@ class BPobject(Pobject):
 class Curve(BPobject):
 	'''Implements a continuous cubic bezier curves'''
 	def __init__(self, points=None, mode='smooth'):
-		self.points = None
+		self.points = points
 		self.mode = mode
 
 	def get_points_and_mode(self):
@@ -74,6 +77,7 @@ class Curve(BPobject):
 		return [points], [self.mode]
 
 	def get_points(self):
+		self.generate_points()
 		return self.points
 
 class Move(BPobject):

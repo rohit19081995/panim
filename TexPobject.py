@@ -6,7 +6,7 @@ import re
 
 from Pobject import Pobject
 
-from constants import *
+from common import *
 
 class TexPobject(Pobject):
 
@@ -40,7 +40,7 @@ class TexPobject(Pobject):
 
     def get_pathstring(self, location):
         # <use x='-72' xlink:href='#g0-89' y='-65.1922'/>
-        return '<use x=\'%f\' y=\'%f\' xlink:href=\'#TexPobject-%d\' transform=\'scale(%f %f)\'/>' % (location[0], location[1], self.texPobject_number, self.xscale, self.yscale)
+        return '<use xlink:href=\'#TexPobject-%d\' transform=\'translate(%f %f) scale(%f %f)\'/>' % (self.texPobject_number, location[0], location[1], self.xscale, self.yscale)
 
     def close(self):
         shutil.rmtree(self.tex_dir)

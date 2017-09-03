@@ -3,6 +3,8 @@ import numpy as np
 from Pobject import Pobject
 from BezierPobject import Curve
 
+from constants import *
+
 class Line(Curve):
 	'''
 	This class implements a line.
@@ -14,6 +16,21 @@ class Line(Curve):
 
 	def generate_points(self):
 		self.points = [self.start, self.end]
+
+class Rectangle(Curve):
+	'''
+	This class implements a rectangle.
+	'''
+	def __init__(self, x, y, dx, dy, **kwargs):
+		super().__init__(mode='jagged')
+		self.x = x
+		self.y = y
+		self.dx = dx
+		self.dy = dy
+		self.generate_points()
+
+	def generate_points(self):
+		self.points = [[self.x,self.y], [self.dx, 0], [0, self.dy], [-self.dx, 0], [0, -self.dy]]
 
 class Arc(Curve):
 	'''
@@ -56,3 +73,17 @@ class Circle(CircularArc):
 	'''
 	def __init__(self, r=1, start_angle=0, end_angle=360, phi=0, no_of_points=10):
 		super().__init__(r, 0, 2*np.pi, phi, no_of_points)
+
+class Function(Curve):
+
+	def __init__(self, func, no_of_points=20, xscale=1, yscale=1, origin=[0,0]):
+		super().__init__()
+		self.func = func
+		self.no_of_points = no_of_points
+		self.generate_points()
+
+	def generate_points(self):
+		x = np.linspace(-X_EXTENT/4, X_EXTENT/4, self.no_of_points)
+		y = self.func(x)
+		print(y[1])
+		self.points = [[x,y] for x,y in zip(x,y)]
